@@ -4,7 +4,7 @@
 import { Injectable, Inject } from '@nestjs/common';
 import { PrismaService } from '../database/prisma.service';
 import { Prisma, User } from '@prisma/client';
-import bcrypt from 'bcrypt';
+import * as bcrypt from 'bcrypt';
 
 // Decorator @Injectable marca esta classe como um serviço que pode ser injetado
 @Injectable()
@@ -22,33 +22,14 @@ export class UserService {
         });
     }
     
-    // Busca múltiplos usuários com filtros opcionais
-    async Users(
-        userWhereInput: Prisma.UserWhereInput,
-    ): Promise<User[]> {
-        return this.prisma.user.findMany({
-            where: userWhereInput,
-        });
-    }
 
     // Cria um novo usuário no banco de dados
     async createUser(data: Prisma.UserCreateInput) {
-        try {
-            // Hash da senha com salt rounds = 10
-            const hashPassword = await bcrypt.hash(data.password, 10);
+        const hashPassword = await bcrypt.hash(data.password, 10);
 
-            // Cria o usuário com a senha hasheada
-            return this.prisma.user.create({ 
-                data: { 
-                    ...data, 
-                    password: hashPassword 
-                } 
-            });
-        } catch (error) {
-            // Log do erro para debug
-            console.error('Erro ao criar usuário:', error);
-            throw error;
-        }
+        return this.prisma.user.create({
+            data: { ...data, password: hashPassword },
+        })
     }
 
     // Atualiza um usuário existente

@@ -18,5 +18,7 @@ import { DatabaseModule } from '../database/database.module'; // Módulo do banc
   // providers: Serviços que este módulo fornece
   // UserService contém a lógica de negócio para operações de usuários
   providers: [UserService],
+
+  exports: [UserService],
 })
 export class UserModule {}

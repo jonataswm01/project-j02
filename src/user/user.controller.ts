@@ -1,9 +1,10 @@
 // Controller responsável por receber e processar requisições HTTP relacionadas a usuários
 // Define as rotas da API e coordena as operações entre a requisição e o service
 
-import { Controller, Post, Body } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete } from '@nestjs/common';
+import { Prisma, User as UserModel } from '@prisma/client';
 import { UserService } from './user.service';
-import { User } from '@prisma/client';
+// Tipo personalizado UserModel baseado no User do Prisma type UserModel = User;
 
 // Decorator @Controller define a rota base para este controller
 // Todas as rotas deste controller começam com '/user'
@@ -15,21 +16,36 @@ export class UserController {
 
     // Decorator @Post define que este método responde a requisições POST
     // A rota completa será: POST /user/signup
-    @Post('signup')
+    @Post()
     async signupUser(
         // Decorator @Body extrai os dados do corpo da requisição HTTP
-        @Body() userData: { name: string; email: string; password: string },
-    ): Promise<User> {
-        // Validação básica - verificar se userData existe e tem os campos obrigatórios
-        if (!userData || !userData.name || !userData.email || !userData.password) {
-            throw new Error('Name, email and password are required');
-        }
+       @Body() userData: Prisma.UserCreateInput,
+    ): Promise<UserModel> {
+        return this.userService.createUser(userData);
+    }
 
-        // Chama o service para criar o usuário no banco de dados
-        return this.userService.createUser({
-            name: userData.name,
-            email: userData.email,
-            password: userData.password,
+    // Decorator @Get define que este método responde a requisições GET
+    // A rota completa será: GET /user/:id
+    @Get(':id')
+    async getUser(@Param('id') id: string): Promise<UserModel | null> {
+        return this.userService.User({ id: Number(id) });
+    }
+
+
+    @Put()
+    async updateUser(
+        @Body() userData: Prisma.UserUpdateInput,
+        @Param('id') id: string,
+    ): Promise<UserModel> {
+        return this.userService.updateUser({
+            where: { id: Number(id) }, 
+            data: userData,
         });
+    }
+    
+
+    @Delete(':id')
+    async deleteUser(@Param('id') id: string): Promise<UserModel> {
+        return this.userService.deleteUser({ id: Number(id) });
     }
 }
