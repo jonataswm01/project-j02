@@ -2,7 +2,7 @@
 // Contém a lógica de login, verificação de credenciais e geração de tokens
 
 import { Inject, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
-import { Prisma } from '@prisma/client';
+import { Prisma, User } from '@prisma/client';
 import { UserService } from 'src/user/user.service';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';

@@ -1,9 +1,10 @@
 // Controller responsável por receber e processar requisições HTTP relacionadas a usuários
 // Define as rotas da API e coordena as operações entre a requisição e o service
 
-import { Body, Controller, Get, Param, Post, Put, Delete } from '@nestjs/common';
+import { Body, Controller, Get, Param, Post, Put, Delete, UseGuards } from '@nestjs/common';
 import { Prisma, User as UserModel } from '@prisma/client';
 import { UserService } from './user.service';
+import { AuthGuard } from 'src/auth/auth.guard';
 // Tipo personalizado UserModel baseado no User do Prisma type UserModel = User;
 
 // Decorator @Controller define a rota base para este controller
@@ -16,6 +17,7 @@ export class UserController {
 
     // Decorator @Post define que este método responde a requisições POST
     // A rota completa será: POST /user/signup
+    @UseGuards(AuthGuard)
     @Post()
     async signupUser(
         // Decorator @Body extrai os dados do corpo da requisição HTTP
@@ -26,12 +28,14 @@ export class UserController {
 
     // Decorator @Get define que este método responde a requisições GET
     // A rota completa será: GET /user/:id
+    @UseGuards(AuthGuard)
     @Get(':id')
     async getUser(@Param('id') id: string): Promise<UserModel | null> {
         return this.userService.User({ id: Number(id) });
     }
 
 
+    @UseGuards(AuthGuard)
     @Put()
     async updateUser(
         @Body() userData: Prisma.UserUpdateInput,
@@ -44,6 +48,7 @@ export class UserController {
     }
     
 
+    @UseGuards(AuthGuard)
     @Delete(':id')
     async deleteUser(@Param('id') id: string): Promise<UserModel> {
         return this.userService.deleteUser({ id: Number(id) });
